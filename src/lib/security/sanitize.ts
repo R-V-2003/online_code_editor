@@ -1,30 +1,24 @@
-import DOMPurify from 'isomorphic-dompurify';
-
 /**
  * Input Sanitization Utilities
  * Prevents XSS and injection attacks
  */
 
 /**
- * Sanitize HTML content
+ * Sanitize HTML content (basic - removes script tags)
  */
 export function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, {
-    WHOLE_DOCUMENT: true,
-    RETURN_DOM_FRAGMENT: false,
-    ADD_TAGS: ['style', 'link'],
-    ADD_ATTR: ['target', 'rel'],
-  });
+  // Remove script tags and event handlers
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/on\w+="[^"]*"/gi, '')
+    .replace(/on\w+='[^']*'/gi, '');
 }
 
 /**
  * Sanitize plain text (remove HTML)
  */
 export function sanitizeText(text: string): string {
-  return DOMPurify.sanitize(text, {
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-  });
+  return text.replace(/<[^>]*>/g, '');
 }
 
 /**

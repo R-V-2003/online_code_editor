@@ -20,7 +20,6 @@
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "isomorphic-dompurify": "^2.21.0",
     "jose": "^5.9.6",
     "lucide-react": "^0.469.0",
     "monaco-editor": "^0.52.2",

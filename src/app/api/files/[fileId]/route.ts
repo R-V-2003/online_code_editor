@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/db/prisma';
 import { requireAuth, isAuthenticated } from '@/lib/auth/middleware';
-import DOMPurify from 'isomorphic-dompurify';
 
 interface RouteContext {
   params: Promise<{ fileId: string }>;
@@ -173,17 +172,9 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
         );
       }
 
-      // Sanitize HTML content
-      let sanitizedContent = content;
-      if (existing.extension === '.html') {
-        sanitizedContent = DOMPurify.sanitize(content, {
-          WHOLE_DOCUMENT: true,
-          RETURN_DOM_FRAGMENT: false,
-        });
-      }
-
-      updateData.content = sanitizedContent;
-      updateData.size = Buffer.byteLength(sanitizedContent, 'utf8');
+      // Use content directly
+      updateData.content = content;
+      updateData.size = Buffer.byteLength(content, 'utf8');
     }
 
     // Update file

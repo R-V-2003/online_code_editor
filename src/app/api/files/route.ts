@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/db/prisma';
 import { requireAuth, isAuthenticated } from '@/lib/auth/middleware';
-import DOMPurify from 'isomorphic-dompurify';
 
 /**
  * Files API
@@ -182,14 +181,8 @@ export async function POST(request: NextRequest) {
       parentId = parentFolder?.id || null;
     }
 
-    // Sanitize content if HTML
-    let sanitizedContent = content || '';
-    if (extension === '.html' && content) {
-      sanitizedContent = DOMPurify.sanitize(content, {
-        WHOLE_DOCUMENT: true,
-        RETURN_DOM_FRAGMENT: false,
-      });
-    }
+    // Use content directly (sanitization moved to client-side for HTML preview)
+    const sanitizedContent = content || '';
 
     // Create file
     const file = await prisma.file.create({
