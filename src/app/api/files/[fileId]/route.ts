@@ -60,8 +60,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
     });
   } catch (error) {
     console.error('Get file error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to get file' },
+      { error: 'Failed to get file', details: errorMessage },
       { status: 500 }
     );
   }
