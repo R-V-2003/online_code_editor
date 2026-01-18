@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
  * Create a new file or folder
  */
 const createFileSchema = z.object({
-  projectId: z.string().cuid(),
+  projectId: z.string().min(1),
   name: z.string().min(1).max(255),
   type: z.enum(['FILE', 'FOLDER']),
   parentPath: z.string().optional(), // Parent folder path

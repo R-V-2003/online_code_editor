@@ -46,8 +46,18 @@ export async function GET(request: NextRequest, context: RouteContext) {
       data: { lastOpenedAt: new Date() },
     });
 
-    // Build file tree
-    const fileTree = buildFileTree(project.files);
+    // Return raw files array (FileExplorer builds tree on client)
+    const filesData = project.files.map(file => ({
+      id: file.id,
+      name: file.name,
+      path: file.path,
+      type: file.type,
+      extension: file.extension,
+      size: file.size,
+      parentId: file.parentId,
+      createdAt: file.createdAt,
+      updatedAt: file.updatedAt,
+    }));
 
     return NextResponse.json({
       project: {
@@ -61,7 +71,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
         createdAt: project.createdAt,
         updatedAt: project.updatedAt,
       },
-      files: fileTree,
+      files: filesData,
     });
   } catch (error) {
     console.error('Get project error:', error);
