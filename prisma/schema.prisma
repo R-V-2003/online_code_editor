@@ -1,0 +1,167 @@
+// Prisma Schema for Cloud Code Editor
+// Supports Users, Projects, Files, and Sessions
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================
+// USER MODEL
+// ===========================================
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String?   // Null for OAuth-only users
+  avatarUrl     String?
+  
+  // OAuth providers
+  googleId      String?   @unique
+  
+  // Account status
+  emailVerified Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  
+  // Relations
+  projects      Project[]
+  sessions      Session[]
+  
+  @@index([email])
+  @@index([googleId])
+}
+
+// ===========================================
+// SESSION MODEL (for JWT refresh tokens)
+// ===========================================
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  
+  @@index([userId])
+  @@index([refreshToken])
+}
+
+// ===========================================
+// PROJECT MODEL
+// ===========================================
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  slug        String   // URL-friendly identifier
+  
+  // Owner
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Project settings
+  isPublic    Boolean  @default(false)
+  language    String   @default("javascript") // Primary language
+  framework   String?  // Optional: react, vue, etc.
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastOpenedAt DateTime @default(now())
+  
+  // Relations
+  files       File[]
+  
+  @@unique([userId, slug])
+  @@index([userId])
+  @@index([slug])
+}
+
+// ===========================================
+// FILE MODEL
+// ===========================================
+model File {
+  id        String   @id @default(cuid())
+  name      String   // Filename with extension
+  path      String   // Full path from project root (e.g., "/src/components/Button.tsx")
+  
+  // File type
+  type      FileType @default(FILE)
+  mimeType  String?
+  extension String?  // .js, .ts, .css, etc.
+  
+  // Content
+  content   String?  @db.Text // For small files, stored directly
+  size      Int      @default(0) // Size in bytes
+  
+  // For large files, reference to external storage
+  storageKey String? // S3 key or local path for large files
+  
+  // Project relation
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Parent folder (self-referencing for tree structure)
+  parentId  String?
+  parent    File?    @relation("FileTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  File[]   @relation("FileTree")
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([projectId, path])
+  @@index([projectId])
+  @@index([parentId])
+  @@index([path])
+}
+
+enum FileType {
+  FILE
+  FOLDER
+}
+
+// ===========================================
+// RATE LIMIT TRACKING
+// ===========================================
+model RateLimitLog {
+  id        String   @id @default(cuid())
+  key       String   // IP or user ID
+  endpoint  String   // API endpoint
+  count     Int      @default(1)
+  windowStart DateTime
+  
+  @@unique([key, endpoint, windowStart])
+  @@index([key])
+  @@index([windowStart])
+}
+
+// ===========================================
+// AI USAGE TRACKING
+// ===========================================
+model AIUsageLog {
+  id           String   @id @default(cuid())
+  userId       String
+  action       String   // explain, fix, generate, refactor
+  inputTokens  Int
+  outputTokens Int
+  model        String
+  latencyMs    Int
+  createdAt    DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+}

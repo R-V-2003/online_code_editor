@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for theming */
+:root {
+  /* Light theme */
+  --editor-bg: #ffffff;
+  --editor-fg: #1e1e1e;
+  --editor-line: #f3f3f3;
+  --editor-selection: #add6ff;
+  --editor-comment: #008000;
+  --editor-keyword: #0000ff;
+  --editor-string: #a31515;
+  --editor-function: #795e26;
+  --editor-variable: #001080;
+  --editor-number: #098658;
+  
+  --sidebar-bg: #f3f3f3;
+  --sidebar-fg: #616161;
+  --sidebar-hover: #e8e8e8;
+  --sidebar-active: #0066bf;
+  
+  --tabs-bg: #ececec;
+  --tabs-active: #ffffff;
+  --tabs-border: #e7e7e7;
+  
+  --terminal-bg: #1e1e1e;
+  --terminal-fg: #cccccc;
+  
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+}
+
+.dark {
+  /* Dark theme (VS Code Dark+) */
+  --editor-bg: #1e1e1e;
+  --editor-fg: #d4d4d4;
+  --editor-line: #2d2d2d;
+  --editor-selection: #264f78;
+  --editor-comment: #6a9955;
+  --editor-keyword: #569cd6;
+  --editor-string: #ce9178;
+  --editor-function: #dcdcaa;
+  --editor-variable: #9cdcfe;
+  --editor-number: #b5cea8;
+  
+  --sidebar-bg: #252526;
+  --sidebar-fg: #cccccc;
+  --sidebar-hover: #2a2d2e;
+  --sidebar-active: #37373d;
+  
+  --tabs-bg: #252526;
+  --tabs-active: #1e1e1e;
+  --tabs-border: #3c3c3c;
+  
+  --terminal-bg: #1e1e1e;
+  --terminal-fg: #cccccc;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}
+
+/* Monaco editor customizations */
+.monaco-editor .margin {
+  background-color: var(--editor-bg) !important;
+}
+
+/* Custom focus styles */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #0066bf;
+  outline-offset: 2px;
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--editor-selection);
+}
+
+/* Code blocks in markdown */
+pre {
+  background-color: var(--editor-bg);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* Animation utilities */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.3s ease-out;
+}
